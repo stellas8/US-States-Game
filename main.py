@@ -16,21 +16,31 @@ states_list = data["state"].to_list()
 
 correct_guesses = []
 
-game_is_on = True
-while game_is_on:
-    answer_state = screen.textinput(title=f"{len(correct_guesses)}/{len(states_list)} States Correct",
-                                    prompt="What's another state's name?")
-    if answer_state.title() in states_list:
-        answer_row = data[data.state == answer_state.title()]
+while len(correct_guesses) < 50:
+    answer_state = screen.textinput(title=f"{len(correct_guesses)}/50 States Correct",
+                                    prompt="What's another state's name?").title()
+    if answer_state in states_list:
+        answer_row = data[data.state == answer_state]
         answer_xcor = int(answer_row.x)
         answer_ycor = int(answer_row.y)
         state_turtle.goto(answer_xcor, answer_ycor)
-        state_turtle.write(answer_state.title(), align="center", font=("Arial", 8, "bold"))
-        correct_guesses.append(answer_state.title())
+        state_turtle.write(answer_state, align="center", font=("Arial", 8, "bold"))
+        correct_guesses.append(answer_state)
     else:
         pass
 
-    if len(correct_guesses) == len(states_list):
-        game_is_on = False
+    if answer_state == "Exit":
+        missing_states = []
+        for state in states_list:
+            if state not in correct_guesses:
+                missing_states.append(state)
 
-screen.exitonclick()
+        states_to_learn = {
+            "states": missing_states
+        }
+
+        new_data = pandas.DataFrame(states_to_learn)
+        new_data.to_csv("States_to_learn.csv")
+        break
+
+
